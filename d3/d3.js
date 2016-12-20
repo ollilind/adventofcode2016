@@ -1,7 +1,7 @@
 'use strict'
 
 let fs = require('fs');
-
+// Get input and pass it to solving function
 let input = fs.readFile('input', 'utf8', function(err, data) {
     if(err) {
         console.log(err);
@@ -10,23 +10,60 @@ let input = fs.readFile('input', 'utf8', function(err, data) {
     d3(data);
 });
 
-function d3 (input, callback) {
+function d3 (input) {
 
+    //Triangles are separated based on linebrakes
     let array = input.split("\n");
-    array.pop();
-    let correct = 0;
+    array.pop(); //one extra linebrakes at the end of file
     
-    array.forEach(function(element,index,array) { 
-        let sides = element.split(/\s+/); 
-        
-        let a = parseInt(sides[0]);
-        let b = parseInt(sides[1]);
-        let c = parseInt(sides[2]);
-
-        if(a < b + c && b < a + c && c < a + b) {
-            correct += 1;
-           }
-    });
-
+    //Split lines to arrays and remove whitespace
+    for(let i = 0; i < array.length; i++) {
+        array[i] = array[i].split(/\s+/);
+    } 
+ 
+    let correct = calculateCorrectTriangles(array);
+    let correctpart2 = calculateCorrectTriangles(rearrangearray(array));
+    
     console.log("D3 Part 1: " + correct);
-}; 
+    console.log("D3 Part 2: " + correctpart2);
+};
+
+// Rearrange array from horisontal to vertical view (Part 2)
+function rearrangearray(originalArray) {
+    
+    let newArray = [];
+
+    while(originalArray.length > 0) {
+        for(let y = 0; y < 3; y++) {
+            let newtriangle = [];
+            for(let i = 0; i < 3; i++) {
+                newtriangle.push((originalArray[i])[y]);
+            }
+            newArray.push(newtriangle);
+        }
+    
+        for(let z = 0; z < 3; z++) {
+            originalArray.shift();
+        }
+   } 
+    return newArray;
+};
+
+// Give array of triangles [[side1, side2, side3],[side1,side2,side3]]
+// Return amount of correct triangles based on side lengths
+function calculateCorrectTriangles(trianglearray) {
+  let correctTriangles = 0;
+
+  trianglearray.forEach(function(element,index,array) { 
+             
+        let a = parseInt(element[0]);
+        let b = parseInt(element[1]);
+        let c = parseInt(element[2]);
+       
+       if(a < b + c && b < a + c && c < a + b) {
+            correctTriangles += 1;
+           }
+
+           });
+   return correctTriangles; 
+}
