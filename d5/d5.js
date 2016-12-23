@@ -49,7 +49,7 @@ function findcorrecthash (text, id) {
 
     //Find the id which produces hash starting with five zeroes
     while(md5(text+id).substring(0,5) != '00000') {
-        id = parseInt(id);
+        id = parseInt(id)+1;
     }
 
     //Return the hash and the ID that produced wanted hash 
