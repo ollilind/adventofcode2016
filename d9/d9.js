@@ -4,7 +4,7 @@
  *  https://adventofcode.com/2016/day/9  *
  *  
  *  Recursive solution to decompress message
- *  Took help for the calculation rule from the Reddit (row 68) 
+ *  The calculation rule and part 1&2 integrating to same function got inspiration from the Reddit (row 54 & 66) 
  ****************************************/
 
 const inputfile = './input';
@@ -26,34 +26,32 @@ fs.readFile(inputfile, 'utf8', function(err, data) {
 //Recursive function that decompresses inputings
 function d9(input, recursive) {
      
+    //Original inputs length
     let length = input.length;
     
     const compressed = (input.substring("(") != -1);
-    
+
     // Decompress inputing
     // if brackets cannot be founded (=contains no compression) skip this loop and return only the length of string itself
-    for (let i = 0; i < input.length && compressed; i++) { 
-
-        //Continue until finds compression marker
-        if (input[i] !== '(') continue; 
+    for (let i = input.indexOf("("); i < input.length && i != -1 && compressed; i = input.indexOf("(",i)) { 
 
         //Extract marker with regex-search
         const marker = input.substr(i).match(/^\((\d+)x(\d+)\)/);  
 
         //Regex search group 1 matches the length of repeated string
-        const matchLength = parseInt(marker[1], 10);
+        const markerlength = parseInt(marker[1], 10);
         
         // Reges search group 2 matches the repeating times
-        const times = parseInt(marker[2], 10);
+        const repeattimes = parseInt(marker[2], 10);
         
         //Starting point of the repetation inputing (marker + its length)
         const start = i + marker[0].length;
 
         //String that needs to be decompressed
-        const decompressedString = input.substr(start, matchLength);
+        const decompressedString = input.substr(start, markerlength);
 
         //If recursive, start decompressing of the decompressed string
-        const decompressedLength d9(decompressedString, true) : decompressedString.length;  // ,3
+        const decompressedLength = recursive ? d9(decompressedString, true) : decompressedString.length;
 
         //Length = original length + how much decompressing makes string longer
         // = decompressed string * repetation times - original compressed string - marker length
@@ -65,8 +63,10 @@ function d9(input, recursive) {
         // = 15  +  5
         // = 20
 
-        length += decompressedLength * times - decompressedString.length - marker[0].length;
-        i = start + decompressedString.length - 1;
+        length += decompressedLength * repeattimes - decompressedString.length - marker[0].length;
+        
+        //Continue from where decompressing ended
+        i = start + decompressedString.length;
     }
     
     return length;
